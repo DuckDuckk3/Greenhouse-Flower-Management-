@@ -1,58 +1,58 @@
 # Greenhouse Flower Management
 
-Ứng dụng quản lý nhà kính trồng hoa được xây dựng theo mô hình ba lớp:
+A greenhouse flower management application built using a three-tier architecture:
 
-- **Frontend:** HTML, CSS và JavaScript thuần.
-- **Backend:** Node.js, Express và REST API.
-- **Database:** Microsoft SQL Server.
+* **Frontend:** Pure HTML, CSS, and JavaScript.
+* **Backend:** Node.js, Express, and REST API.
+* **Database:** Microsoft SQL Server.
 
-Dữ liệu cảm biến hiện được mô phỏng tại backend. MQTT chưa được tích hợp; khi tích hợp, payload MQTT sẽ đi qua cùng luồng xử lý đang dùng cho simulator.
+Sensor data is currently simulated at the backend. MQTT has not yet been integrated; when integrated, MQTT payloads will pass through the same processing pipeline currently used by the simulator.
 
-## Chức năng chính
+## Key Features
 
-- Dashboard theo dõi nhiệt độ, độ ẩm, ánh sáng, CO2 và cảnh báo.
-- Quản lý cấu trúc `Farm → Greenhouse → Zone`.
-- Quản lý cảm biến và thiết bị đầu ra.
-- Điều khiển thiết bị ở chế độ `AUTO` hoặc `MANUAL`.
-- Quản lý Recipe, GrowthStage và Threshold.
-- Theo dõi tiến độ Recipe tại từng Zone.
-- Điều chỉnh chu kỳ riêng cho từng Zone và lưu lý do.
-- Tạo, xác nhận và giải quyết cảnh báo.
-- Audit Log cho thao tác người dùng và hành động tự động.
-- Quản lý tài khoản, phân quyền và đổi mật khẩu.
+* Dashboard for monitoring temperature, humidity, light, CO2, and alerts.
+* Management of the `Farm → Greenhouse → Zone` structure.
+* Sensor and actuator management.
+* Device control in `AUTO` or `MANUAL` mode.
+* Recipe, GrowthStage, and Threshold management.
+* Recipe progress tracking for each Zone.
+* Individual cycle adjustment for each Zone with a recorded reason.
+* Alert creation, acknowledgment, and resolution.
+* Audit Log for user operations and automatic actions.
+* Account management, role-based access control, and password changes.
 
-Các metric cảm biến đang sử dụng: `Temperature`, `Humidity`, `SoilHumidity`, `Light`, `CO2` và `PH`.
+The sensor metrics currently used are: `Temperature`, `Humidity`, `SoilHumidity`, `Light`, `CO2`, and `PH`.
 
-## Cấu trúc thư mục
+## Project Structure
 
 ```text
 Greenhouse-Flower-Management/
 ├── index.html
-├── css/                  # Giao diện
-├── js/                   # Logic frontend và API client
-├── smartfarm-api/        # Express API và simulator
-├── SQLQuery1.sql         # Schema và dữ liệu mẫu
+├── css/                  # User interface
+├── js/                   # Frontend logic and API client
+├── smartfarm-api/        # Express API and simulator
+├── SQLQuery1.sql         # Database schema and sample data
 └── README.md
 ```
 
-## Yêu cầu môi trường
+## Environment Requirements
 
-- Node.js 18 trở lên.
-- Microsoft SQL Server.
-- Trình duyệt hiện đại.
-- VS Code Live Server hoặc một HTTP server tĩnh.
+* Node.js 18 or later.
+* Microsoft SQL Server.
+* A modern web browser.
+* VS Code Live Server or another static HTTP server.
 
-## Khởi tạo database
+## Database Setup
 
-1. Mở SQL Server Management Studio.
-2. Chạy file `SQLQuery1.sql` trên SQL Server.
-3. Script sẽ tạo database `SmartFarmDB`, các bảng và dữ liệu kiểm thử.
+1. Open SQL Server Management Studio.
+2. Run `SQLQuery1.sql` on SQL Server.
+3. The script will create the `SmartFarmDB` database, tables, and test data.
 
-> `SQLQuery1.sql` là script khởi tạo đầy đủ và nên chạy trên database sạch. Không chạy lặp lại trên database đã có bảng.
+> `SQLQuery1.sql` is a complete initialization script and should be run on a clean database. Do not run it repeatedly on a database where the tables already exist.
 
-## Cấu hình backend
+## Backend Configuration
 
-Trong thư mục `smartfarm-api`, tạo file `.env` dựa trên `.env.example`:
+Inside the `smartfarm-api` directory, create a `.env` file based on `.env.example`:
 
 ```env
 DB_HOST=localhost
@@ -65,90 +65,98 @@ SIMULATION_ENABLED=true
 SIMULATION_INTERVAL_MS=10000
 ```
 
-Không commit file `.env` hoặc mật khẩu thật lên GitHub.
+Do not commit the `.env` file or real passwords to GitHub.
 
-## Chạy ứng dụng
+## Running the Application
 
 ### 1. Backend
 
-```powershell
+Open a terminal in the `smartfarm-api` directory:
+
+```bash
 cd smartfarm-api
 npm install
 npm start
 ```
 
-Backend mặc định chạy tại `http://localhost:5000`.
+The backend runs by default at:
+
+```text
+http://localhost:5000
+```
 
 ### 2. Frontend
 
-Mở terminal tại thư mục gốc dự án:
+Open a terminal in the project root directory:
 
-```powershell
+```bash
 npx http-server -o
 ```
 
-Cũng có thể mở `index.html` bằng VS Code Live Server. Không nên mở trực tiếp bằng `file://` vì frontend sử dụng JavaScript modules.
+You can also open `index.html` using VS Code Live Server.
 
-## Tài khoản mẫu
+It is not recommended to open `index.html` directly using `file://` because the frontend uses JavaScript modules.
 
-| Vai trò | Tài khoản | Mật khẩu |
-|---|---|---|
-| OWNER chính | `greenhouse_owner` | `demo123` |
-| TECHNICIAN | `agronomist` | `demo123` |
-| OPERATOR | `operator_a` | `demo123` |
-| Chờ phê duyệt | `pending_operator` | `demo123` |
+## Demo Accounts
 
-Hệ thống có thể có nhiều OWNER, nhưng chỉ một tài khoản có `is_primary_owner = 1`:
+| **Role**         | **Username**       | **Password** |
+| ---------------- | ------------------ | ------------ |
+| Primary OWNER    | `greenhouse_owner` | `demo123`    |
+| TECHNICIAN       | `agronomist`       | `demo123`    |
+| OPERATOR         | `operator_a`       | `demo123`    |
+| Pending Approval | `pending_operator` | `demo123`    |
 
-- OWNER chính không xuất hiện trong danh sách quản lý tài khoản.
-- OWNER chính không thể bị xóa, khóa hoặc đổi vai trò.
-- OWNER phụ có thể được phân quyền hoặc xóa như tài khoản thông thường.
-- Chỉ OWNER đang hoạt động được truy cập trang quản lý tài khoản và các API quản lý user.
+The system may have multiple OWNER accounts, but only one account can have `is_primary_owner = 1`:
 
-Mật khẩu trong bài tập đang lưu dạng văn bản để đơn giản hóa demo. Hệ thống thực tế phải dùng bcrypt/Argon2 và JWT hoặc session an toàn.
+* The primary OWNER does not appear in the account management list.
+* The primary OWNER cannot be deleted, disabled, or have their role changed.
+* Secondary OWNER accounts can be assigned permissions or deleted like regular accounts.
+* Only an active OWNER can access the account management page and user-management APIs.
 
-## Recipe và tiến độ Zone
+Passwords are stored as plain text in this academic project for demonstration purposes. A production system should use bcrypt/Argon2 and secure JWT or session-based authentication.
 
-`Recipe`, `GrowthStage` và `Threshold` chỉ định nghĩa công thức mẫu. Tiến độ không được lưu trên Recipe mà được tính riêng cho từng Zone dựa trên:
+## Recipe and Zone Progress
+
+`Recipe`, `GrowthStage`, and `Threshold` define the template growing configuration. Progress is not stored directly on the Recipe. Instead, it is calculated separately for each Zone based on:
 
 ```text
-ngày hiện tại = hôm nay - start_date + 1
-ngày hiệu chỉnh = ngày hiện tại - cycle_adjustment_days
+current_day = today - start_date + 1
+adjusted_day = current_day - cycle_adjustment_days
 ```
 
-Mỗi Zone hiển thị:
+Each Zone displays:
 
-- Giai đoạn hiện tại.
-- Phần trăm tiến độ.
-- Timeline các GrowthStage.
-- Ngày dự kiến hoàn thành.
-- Ngưỡng của giai đoạn hiện tại.
-- Số ngày và lý do điều chỉnh chu kỳ.
+* Current growth stage.
+* Progress percentage.
+* GrowthStage timeline.
+* Expected completion date.
+* Thresholds for the current stage.
+* Number of adjusted days and the reason for the cycle adjustment.
 
-Điều chỉnh một Zone không làm thay đổi Recipe hoặc các Zone khác sử dụng cùng Recipe.
+Adjusting one Zone does not modify the Recipe or other Zones using the same Recipe.
 
-## Backend simulator
+## Backend Simulator
 
-Simulator mặc định tạo dữ liệu sau mỗi 10 giây cho các cảm biến đang hoạt động. Mỗi giá trị sẽ:
+The simulator generates data every 10 seconds by default for active sensors. Each generated value:
 
-1. Được lưu vào `SensorData`.
-2. Cập nhật nhiệt độ hoặc độ ẩm của Zone nếu phù hợp.
-3. Được so sánh với Threshold của GrowthStage hiện tại.
-4. Tạo, cập nhật hoặc đóng AlertLog.
-5. Điều khiển thiết bị `AUTO` nếu cần.
-6. Ghi hành động tự động vào Audit Log.
+1. Is stored in `SensorData`.
+2. Updates the Zone temperature or humidity when applicable.
+3. Is compared with the Threshold of the current GrowthStage.
+4. Creates, updates, or closes an `AlertLog`.
+5. Controls an `AUTO` actuator when necessary.
+6. Records automatic actions in the Audit Log.
 
-API kiểm thử simulator:
+### Simulator Testing API
 
-| Method | Endpoint | Công dụng |
-|---|---|---|
-| GET | `/api/simulation/status` | Xem trạng thái simulator |
-| POST | `/api/simulation/start` | Bắt đầu simulator |
-| POST | `/api/simulation/stop` | Dừng simulator |
-| POST | `/api/simulation/tick` | Chạy ngay một lượt |
-| POST | `/api/simulation/readings` | Gửi một giá trị cảm biến thử |
+| **Method** | **Endpoint**               | **Description**                      |
+| ---------- | -------------------------- | ------------------------------------ |
+| GET        | `/api/simulation/status`   | Check simulator status               |
+| POST       | `/api/simulation/start`    | Start the simulator                  |
+| POST       | `/api/simulation/stop`     | Stop the simulator                   |
+| POST       | `/api/simulation/tick`     | Run one simulation cycle immediately |
+| POST       | `/api/simulation/readings` | Send a test sensor reading           |
 
-Ví dụ body cho giá trị thử:
+Example request body for a test sensor value:
 
 ```json
 {
@@ -159,30 +167,30 @@ Ví dụ body cho giá trị thử:
 
 ## Audit Log
 
-Audit Log hỗ trợ các loại đối tượng:
+The Audit Log supports the following object types:
 
 ```text
 DEVICE, ZONE, GREENHOUSE, FARM, RECIPE,
 GROWTH_STAGE, ALERT, USER, SIMULATION
 ```
 
-Log được tạo cho đăng nhập/đăng xuất, đổi mật khẩu, quản lý tài khoản, CRUD cấu trúc nhà kính, thiết bị, công thức, cảnh báo, điều khiển thủ công và hành động tự động của simulator.
+Logs are created for login/logout, password changes, account management, CRUD operations on greenhouse structures, devices, recipes, alerts, manual control actions, and automatic simulator actions.
 
-## Kiểm thử
+## Testing
 
-Trong thư mục `smartfarm-api`:
+Inside the `smartfarm-api` directory:
 
-```powershell
+```bash
 npm test
 npm run test:integration
 ```
 
-- `npm test`: kiểm tra cú pháp và các hàm logic thuần.
-- `npm run test:integration`: kiểm tra luồng `SensorData → AlertLog → AUTO actuator` với SQL Server và tự dọn dữ liệu thử.
+* `npm test`: checks syntax and pure logic functions.
+* `npm run test:integration`: tests the `SensorData → AlertLog → AUTO actuator` workflow with SQL Server and automatically cleans up test data.
 
-## Ghi chú triển khai
+## Deployment Notes
 
-- Frontend gọi API tại `http://localhost:5000/api`.
-- Dashboard và trang Log tự cập nhật mỗi 10 giây khi đang được mở.
-- Nếu thay source backend, cần dừng và chạy lại `npm start`.
-- Nếu trình duyệt vẫn dùng JavaScript cũ, nhấn `Ctrl + F5`.
+* The frontend calls the API at `http://localhost:5000/api`.
+* The Dashboard and Log pages automatically refresh every 10 seconds while open.
+* If the backend source code is changed, stop and restart the backend using `npm start`.
+* If the browser is still using cached JavaScript, press `Ctrl + F5`.
